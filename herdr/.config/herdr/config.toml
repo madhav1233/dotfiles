@@ -1,0 +1,98 @@
+# herdr configuration — mirrors ~/.tmux.conf
+# Validate:  herdr config check
+# Apply:     herdr server reload-config   (or prefix+r)
+
+onboarding = false
+
+# ── Theme ─────────────────────────────────────────────────────────────────
+# tmux: catppuccin/tmux with @catppuccin_flavor 'mocha'.
+# herdr's "catppuccin" IS mocha ("catppuccin-latte" is the light variant).
+[theme]
+name = "catppuccin"
+auto_switch = false
+
+# ── New panes ─────────────────────────────────────────────────────────────
+# tmux: splits are bound with -c "#{pane_current_path}", i.e. inherit the cwd.
+[terminal]
+new_cwd = "follow"
+
+# ── Keys ──────────────────────────────────────────────────────────────────
+[keys]
+prefix = "ctrl+s"                  # set -g prefix C-s
+
+reload_config = "prefix+r"         # bind r source-file ~/.tmux.conf
+resize_mode = ""                   # tmux has no resize mode; frees prefix+r
+
+detach = "prefix+d"                # tmux default (herdr ships prefix+q)
+copy_mode = "prefix+["             # tmux default; setw -g mode-keys vi
+
+# Splits. In herdr "horizontal" divides top/bottom (tmux split-window -v,
+# bound to ") and "vertical" divides left/right (tmux -h, bound to %).
+split_horizontal = "prefix+\""
+split_vertical = "prefix+%"
+
+# bind -r h/j/k/l select-pane
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# bind -r H/J/K/L resize-pane. These are herdr's swap_pane_* defaults, so
+# those are unbound to keep the tmux meaning of shift+hjkl.
+resize_pane_left = "prefix+shift+h"
+resize_pane_down = "prefix+shift+j"
+resize_pane_up = "prefix+shift+k"
+resize_pane_right = "prefix+shift+l"
+swap_pane_left = ""
+swap_pane_down = ""
+swap_pane_up = ""
+swap_pane_right = ""
+
+# ── Agents: their own controls, alt-prefixed so they never collide with the
+#    tmux-shaped pane/tab keys above ─────────────────────────────────────
+previous_agent = "prefix+alt+k"    # up the agent panel
+next_agent = "prefix+alt+j"        # down the agent panel
+focus_agent = "prefix+alt+1..9"    # jump straight to agent row 1-9
+toggle_sidebar = "prefix+b"        # show/hide the panel the agents live in
+
+# tmux: bind M-'"' / M-% split-window -c "#{session_path}"
+# herdr exposes no workspace root path, so the helper uses the cwd of the
+# workspace's first pane as the "session path".
+[[keys.command]]
+key = "prefix+alt+\""
+type = "shell"
+command = "$HOME/.config/herdr/split-from-root.sh down"
+
+[[keys.command]]
+key = "prefix+alt+%"
+type = "shell"
+command = "$HOME/.config/herdr/split-from-root.sh right"
+
+# ── UI ────────────────────────────────────────────────────────────────────
+[ui]
+tab_bar_position = "top"           # set -g status-position top
+mouse_capture = true               # set -g mouse on
+prompt_new_tab_name = false        # tmux new-window doesn't prompt for a name
+
+# tmux draws internal splitters only, no outside frame, no gaps, no scrollbars.
+pane_outer_borders = false
+pane_gaps = false
+pane_scrollbars = false
+
+show_agent_labels_on_pane_borders = true
+status_indicators = "symbols"
+
+# status-left ""  — herdr's left side is the tab row itself.
+# status-right: catppuccin directory + session modules, plus tmux's Z flag.
+tab_bar_right = [
+  { type = "zoom" },
+  { type = "command", command = "~/.config/herdr/status.sh", interval_seconds = 3, timeout_seconds = 2 },
+]
+tab_bar_right_separator = " "
+
+[ui.sidebar.agents]
+row_gap = 0
+rows = [["state_icon", "workspace", "tab"], ["agent"]]
+
+[ui.toast]
+delivery = "terminal"
