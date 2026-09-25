@@ -24,7 +24,7 @@ stow directory's parent *is* the target, `stow <pkg>` needs no `-t` flag.
 git clone --recurse-submodules git@github.com:madhav1233/dotfiles.git ~/dotfiles
 
 # 2. Prerequisites the configs expect to already exist.
-brew install stow fzf herdr
+brew install tmux stow fzf herdr
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
@@ -39,6 +39,23 @@ overwrite it. Delete that file and re-run `stow zsh`, or use `stow --adopt zsh`
 to pull the existing file into the package.
 
 Neovim bootstraps lazy.nvim on first launch; no manual plugin step needed.
+
+### tmux specifics
+
+- **tmux 3.4 or newer is required** — `.tmux.conf` uses `message-line`, which
+  landed in 3.4. **3.6a or newer is preferred**: the fix for the cursor landing
+  on the wrong line when `message-line` is not 0 shipped in 3.6a, and the `:`
+  binding sets it to 1. Older tmux errors out on the option.
+- tpm must be cloned **before** the first launch, or the `run '~/.tmux/plugins/tpm/tpm'`
+  line at the bottom of the conf fails.
+- Until `prefix + I` has run, `status-right` renders empty: it references
+  `@catppuccin_status_directory` / `@catppuccin_status_session`, which only exist
+  once the plugin is installed.
+- The status line needs a **Nerd Font** — catppuccin's rounded style uses U+E0B6
+  and its directory module uses U+F07B. Ghostty covers this with no font setting;
+  Terminal.app or iTerm2 need one selected explicitly.
+- `default-terminal "tmux-256color"` needs that terminfo entry to exist. It's
+  present on current macOS; older systems may need an ncurses install.
 
 ## Day to day
 
